@@ -1,0 +1,105 @@
+import java.util.Calendar
+
+
+val int OP_MODE_MANUAL    = 1
+val int OP_MODE_ABSENCE   = 2
+val int OP_MODE_AUTO      = 3
+val int OP_AUTO_MATN      = 4
+val int OP_AUTO_JOUR      = 5
+val int OP_AUTO_SOIR      = 6
+val int OP_AUTO_NUIT      = 7
+
+var String txt
+var int setpoint
+var int DayPart
+
+rule "Thermo Trigger : Evaluate Times" when Item ThermoTrigger received command
+then
+    
+    val Calendar  cal = Calendar.getInstance
+    
+    val long h        = cal.get(Calendar.HOUR_OF_DAY)
+    val long m        = cal.get(Calendar.MINUTE)
+    val long s        = cal.get(Calendar.SECOND)
+
+    val long currTime = (60 * h + m) * 60 + s
+    val long matnTime = (Thermo_Time_Matn.state as Number).longValue
+    val long jourTime = (Thermo_Time_Jour.state as Number).longValue
+    val long soirTime = (Thermo_Time_Soir.state as Number).longValue
+    val long nuitTime = (Thermo_Time_Nuit.state as Number).longValue
+
+    switch (Thermo_OpMode.state)
+    {
+        case OP_MODE_MANUAL  :
+        {
+            DayPart = OP_MODE_MANUAL
+            setpoint = Thermo_Temp_Manual.state
+            txt = "Mode MANUEL, " + setpoint + "°C"
+        }
+        case OP_MODE_ABSENCE :
+        {
+            DayPart = OP_MODE_ABSENCE
+            setpoint = Thermo_Temp_Absence.state
+	        txt = "Mode ABSENCE, " + setpoint + "°C"
+        }
+        case OP_MODE_AUTO    :
+        {
+            if      (currTime < matnTime)       DayPart   = OP_AUTO_NUIT
+            else if (currTime < jourTime)       DayPart   = OP_AUTO_MATN
+            else if (currTime < soirTime)       DayPart   = OP_AUTO_JOUR
+            else if (currTime < nuitTime)       DayPart   = OP_AUTO_SOIR
+            else /* (currTime < nuitTime) */    DayPart   = OP_AUTO_NUIT
+        
+            txt = "AUTO, ";
+            switch (DayPart)
+            {
+                case OP_AUTO_MATN      :
+                {
+                    txt = txt + Thermo_Time_Matn_str.state + " - " 
+		    	              + Thermo_Time_Jour_str.state + "  :  " 
+		                      + Thermo_Temp_Matn.state     + "°C"
+                    setpoint  = Thermo_Temp_Matn.state
+                }
+                case OP_AUTO_JOUR      :
+                {
+                    txt = txt + Thermo_Time_Jour_str.state + " - " 
+		            	      + Thermo_Time_Soir_str.state + "  :  " 
+		            	      + Thermo_Temp_Jour.state     + "°C"
+                    setpoint  = Thermo_Temp_Jour.state
+                }
+                case OP_AUTO_SOIR      :
+                {
+                    txt = txt + Thermo_Time_Soir_str.state + " - " 
+		            	      + Thermo_Time_Nuit_str.state + "  :  " 
+		            	      + Thermo_Temp_Soir.state     + "°C"
+                    setpoint  = Thermo_Temp_Soir.state
+                }
+                case OP_AUTO_NUIT      :
+                {
+                    txt = txt + Thermo_Time_Nuit_str.state + " - " 
+		            		  + Thermo_Time_Matn_str.state + "  :  " 
+		            		  + Thermo_Temp_Nuit.state     + "°C"
+                    setpoint  = Thermo_Temp_Nuit.state
+                }
+            }
+        }
+    }
+
+    if (txt != Thermo_OpMode_DayPart.state.toString())
+    {
+        logInfo("thermotrigger.rules", 
+          "OP:" + Thermo_OpMode.state + ", oDP" + Thermo_DayPart.state + ", nDP:" + DayPart + ", txt:" + txt
+        + " T:" + currTime + ", M:" + matnTime + "  J:" + jourTime + ", S:" + soirTime + ", N:" + nuitTime)
+
+        Thermo_DayPart.postUpdate (DayPart)
+        Thermo_OpMode_DayPart.postUpdate(txt)	
+		if (chThermo_SetPoint_Out.state != setpoint)
+    	{
+        	chThermo_SetPoint_Out.sendCommand(setpoint)
+    	}
+    }
+
+end
+// print("T: " + currTime + "  J:" + jourTime + "   N:" + nuitTime + "\n")
+// vim: syntax=Xtend
+

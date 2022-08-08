@@ -1,0 +1,118 @@
+sitemap RMJ label="Gestion SIBIR"
+{
+	Frame label="Mode de Fonctionnement"
+	{
+		Selection item=Thermo_OpMode label="" icon="id_mode" mappings=[3="Automatique (jour/nuit)", 2="Absence (absence)", 1="Manuel (consigne)"] 
+		Setpoint  item=Thermo_Temp_Manual_MmiEdit minValue=5.0 maxValue=30.0 step=1.0 visibility=[Thermo_OpMode==1]
+
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="information"	visibility=[Thermo_DayPart==2]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunrise"		visibility=[Thermo_DayPart==4]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunday"		visibility=[Thermo_DayPart==5]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunset"		visibility=[Thermo_DayPart==6]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunight"		visibility=[Thermo_DayPart==7]
+
+	    Text      item=Indoor_Measured_Temp
+	}
+
+	Frame label="Informations"
+	{
+		Text item=Thermo_BattLevel
+		Text item=Outdoor_Weather_Temp	
+		Text item=Outdoor_Weather_Humid	
+	}
+
+	Frame label="Utilitaires" icon="icon_utilities"
+	{
+
+		Text label="Réglages" icon="settings"
+		{
+			Frame label="Horaires" icon="time"
+			{
+				Text item=Thermo_Time_Matn_str
+				{
+               		Setpoint item=Thermo_Time_Matn_HR_nb minValue=0 maxValue=23 step=1
+               		Setpoint item=Thermo_Time_Matn_MN_nb minValue=0 maxValue=55 step=5
+			   		Switch   item=Thermo_Time_Matn_SetOK mappings=[2="OK", 3="CANCEL"] visibility=[Thermo_Time_Matn_SetOK!=0]
+				}
+				Text item=Thermo_Time_Jour_str
+				{
+               		Setpoint item=Thermo_Time_Jour_HR_nb minValue=0 maxValue=23 step=1
+               		Setpoint item=Thermo_Time_Jour_MN_nb minValue=0 maxValue=55 step=5
+			   		Switch   item=Thermo_Time_Jour_SetOK mappings=[2="OK", 3="CANCEL"] visibility=[Thermo_Time_Jour_SetOK!=0]
+				}
+				Text item=Thermo_Time_Soir_str
+				{
+               		Setpoint item=Thermo_Time_Soir_HR_nb minValue=0 maxValue=23 step=1
+               		Setpoint item=Thermo_Time_Soir_MN_nb minValue=0 maxValue=55 step=5
+			   		Switch   item=Thermo_Time_Soir_SetOK mappings=[2="OK", 3="CANCEL"] visibility=[Thermo_Time_Soir_SetOK!=0]
+				}
+				Text item=Thermo_Time_Nuit_str
+				{
+               		Setpoint item=Thermo_Time_Nuit_HR_nb minValue=0 maxValue=23 step=1
+               		Setpoint item=Thermo_Time_Nuit_MN_nb minValue=0 maxValue=55 step=5
+			   		Switch   item=Thermo_Time_Nuit_SetOK mappings=[2="OK", 3="CANCEL"] visibility=[Thermo_Time_Nuit_SetOK!=0]
+				}
+			}
+		
+			Frame label="Températures" icon="temperature"
+			{
+				Setpoint item=Thermo_Temp_Matn   		minValue=5.0 maxValue=30.0 step=1.0 			
+				Setpoint item=Thermo_Temp_Jour   		minValue=5.0 maxValue=30.0 step=1.0 		
+				Setpoint item=Thermo_Temp_Soir   		minValue=5.0 maxValue=30.0 step=1.0 					
+				Setpoint item=Thermo_Temp_Nuit   		minValue=5.0 maxValue=30.0 step=1.0 						
+				Setpoint item=Thermo_Temp_Absence		minValue=5.0 maxValue=30.0 step=1.0 						
+			}
+
+		}
+	
+		Text label="Graphiques" icon="chart"
+		{
+			Frame 
+			{
+				Switch item=Temp_Chart_Period label="" icon="chart" mappings=[0="1h",1="8h", 2="1j", 3="3j",4="1s"]
+			}
+			Frame 
+			{
+				Chart item=gIndoor_Chart period=h   refresh=60000  visibility=[Temp_Chart_Period==0, Temp_Chart_Period=="NULL"]
+				Chart item=gIndoor_Chart period=8h  refresh=240000 visibility=[Temp_Chart_Period==1]
+				Chart item=gIndoor_Chart period=D   refresh=480000 visibility=[Temp_Chart_Period==2]
+				Chart item=gIndoor_Chart period=3D  refresh=480000 visibility=[Temp_Chart_Period==3]
+				Chart item=gIndoor_Chart period=W   refresh=480000 visibility=[Temp_Chart_Period==4]
+			}
+			Frame 
+			{
+				Chart item=gOutdoor_Chart period=h  refresh=60000  visibility=[Temp_Chart_Period==0, Temp_Chart_Period=="NULL"]
+				Chart item=gOutdoor_Chart period=8h refresh=240000 visibility=[Temp_Chart_Period==1]
+				Chart item=gOutdoor_Chart period=D  refresh=480000 visibility=[Temp_Chart_Period==2]
+				Chart item=gOutdoor_Chart period=3D refresh=480000 visibility=[Temp_Chart_Period==3]
+				Chart item=gOutdoor_Chart period=W  refresh=480000 visibility=[Temp_Chart_Period==4]
+			}
+			Text label="Debug" 
+			{
+				Text	item=chThermo_SetPoint_Inp
+				Text	item=chThermo_SetPoint_Out
+
+				Text	item=chSibSwBin_Soll_InpCmd label="Sib Soll [%s]"
+				Text	item=chSibSwBin_Ist_RealCmd label="Sib Ist [%s]"
+
+				Text	item=DBG_SibSw_Soll_InpCmd 
+				Text	item=DBG_SibSw_Ist_RealCmd
+
+				Text	item=DBG_SibNum_SWITCH_State
+			//	Text	item=DBG_SibNum_SIBIR_State
+
+				Text	item=Thermo_Command
+				Text	item=Sibir_Real_State
+				
+			    Switch  item=MyTestSwitch  
+			    Switch   item=MyTestSwitch2
+			}
+
+		}
+	}
+	//Webview url="/static/HideHeader.html"
+	//Webview url="http://www.openhab.org" height=5
+}
+
+
+// vim: syntax=Xtend

@@ -1,0 +1,427 @@
+
+import java.util.concurrent.locks.ReentrantLock
+val ReentrantLock TheLock = new ReentrantLock
+
+
+val int OP_UNDEFINED      = 0
+val int OP_MODE_MANUAL    = 1
+val int OP_MODE_ABSENCE   = 2
+val int OP_MODE_AUTO      = 3
+val int OP_AUTO_MATN      = 4
+val int OP_AUTO_JOUR      = 5
+val int OP_AUTO_SOIR      = 6
+val int OP_AUTO_NUIT      = 7
+
+var Timer 	timer_MatnTime_Editing = null    
+var Timer 	timer_JourTime_Editing = null    
+var Timer 	timer_SoirTime_Editing = null    
+var Timer 	timer_NuitTime_Editing = null    
+var Timer 	timer_Setpoint_Editing = null    
+
+//*****************************************************************************
+rule "Weather Outdoor Temp"  when Item chYahooWeather_Temp	changed  
+	then Outdoor_Weather_Temp.postUpdate	(chYahooWeather_Temp.state) 	
+end
+
+rule "Weather Outdoor Humid" when Item chYahooWeather_Humid	changed  
+	then Outdoor_Weather_Humid.postUpdate	(chYahooWeather_Humid.state)
+end
+
+/*
+rule "chThermo_SetPoint_Inp" when Item chThermo_SetPoint_Inp received update  
+then // Overwrite an eventual modification from the device
+	switch ((Thermo_OpMode.state as Number).intValue)
+	{
+		case OP_MODE_AUTO : // Automatic Mode
+		{
+			switch ((Thermo_DayPart.state  as Number).intValue)
+			{
+				case OP_AUTO_MATN : Thermo_Temp_Matn.postUpdate(chThermo_SetPoint_Inp.state)
+				case OP_AUTO_JOUR : Thermo_Temp_Jour.postUpdate(chThermo_SetPoint_Inp.state)
+				case OP_AUTO_SOIR : Thermo_Temp_Soir.postUpdate(chThermo_SetPoint_Inp.state)
+				case OP_AUTO_NUIT : Thermo_Temp_Nuit.postUpdate(chThermo_SetPoint_Inp.state)
+			}
+		}
+		case OP_MODE_MANUAL  : Thermo_Temp_Manual_MmiEdit.postUpdate(chThermo_SetPoint_Inp.state)
+		case OP_MODE_ABSENCE : Thermo_Temp_Absence.postUpdate        (chThermo_SetPoint_Inp.state)
+	}
+end
+*/
+
+//*****************************************************************************
+
+rule "chThermo_BattLevel" when Item chThermo_BattLevel    received update  then Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	end
+rule "chThermo_MeasTemp"  when Item chThermo_MeasTemp     received update  then Indoor_Measured_Temp.postUpdate (chThermo_MeasTemp.state) 	end
+
+//*****************************************************************************
+// Debug purpose : Chart 
+
+rule "DBG_chSibSwNum_SWITCH_State"  when Item chSibSwNum_SWITCH_State	changed  
+	then DBG_SibNum_SWITCH_State.postUpdate	((chSibSwNum_SWITCH_State.state as Number).intValue) 	
+end
+
+//rule "DBG_chSibSwNum_SIBIR_State"  when Item chSibSwNum_SIBIR_State	changed  
+//	then DBG_SibNum_SIBIR_State.postUpdate	((chSibSwNum_SIBIR_State.state as Number).intValue) 	
+//end
+
+rule "DBG System started" when System started
+then 
+	DBG_SibNum_SWITCH_State.postUpdate	(0) 	
+//	DBG_SibNum_SIBIR_State.postUpdate	(0) 
+	DBG_Thermo_Command.postUpdate   (0.0)	// false -> 20
+	DBG_SibSw_Ist_RealCmd.postUpdate(0.5)	// false -> 20
+	DBG_SibSw_Soll_InpCmd.postUpdate(1.0)	// false -> 20
+
+
+
+
+end
+
+//*****************************************************************************
+rule "chThermo_HeaterCmd" when Item chThermo_HeaterCmd  received update 
+then 
+	Thermo_Command.postUpdate(chThermo_HeaterCmd.state) 
+
+	// Debug purpose : Chart 
+	if (chThermo_HeaterCmd.state == OFF) 	// scaled as :
+		DBG_Thermo_Command.postUpdate(0.0)	// false -> 20
+	else
+		DBG_Thermo_Command.postUpdate(3.0)	// true  -> 22
+end
+
+//*****************************************************************************
+rule "chSibSwBin_Ist_RealCmd" when Item chSibSwBin_Ist_RealCmd changed
+then 
+	Sibir_Real_State.postUpdate(chSibSwBin_Ist_RealCmd.state) 
+
+	// Debug purpose : Chart 
+	if (chSibSwBin_Ist_RealCmd.state == OFF)	// scaled as :
+		DBG_SibSw_Ist_RealCmd.postUpdate(0.5)	// false -> 20
+	else
+		DBG_SibSw_Ist_RealCmd.postUpdate(3.5)	// true  -> 22
+end
+
+rule "chSibSwBin_Soll_InpCmd" when Item chSibSwBin_Soll_InpCmd changed
+then 
+	// Debug purpose : Chart 
+	if (chSibSwBin_Soll_InpCmd.state == OFF)	// scaled as :
+		DBG_SibSw_Soll_InpCmd.postUpdate(1.0)	// false -> 20
+	else
+		DBG_SibSw_Soll_InpCmd.postUpdate(4.0)	// true  -> 22
+end
+
+
+//*****************************************************************************
+//*****************************************************************************
+//*****************************************************************************
+rule "Thermo System : System started"
+when
+	System started
+then
+	var long hr
+	var long mn
+
+	SYS_InitLevel.postUpdate(0)
+
+	logWarn("thermostat.rules", "SysInit-0 : System Started, Waiting for persistance updating parameters")
+	Thread::sleep(2000)
+
+	logWarn("thermostat.rules", "SysInit-1 : Check persistant parameters, first start default init")
+	if((Thermo_Time_Matn.state   == NULL) || (Thermo_Temp_Matn.state   == NULL)
+	|| (Thermo_Time_Jour.state   == NULL) || (Thermo_Temp_Jour.state   == NULL)
+	|| (Thermo_Time_Soir.state   == NULL) || (Thermo_Temp_Soir.state   == NULL)
+	|| (Thermo_Time_Nuit.state   == NULL) || (Thermo_Temp_Nuit.state   == NULL)
+	|| (Thermo_OpMode.state == NULL)   
+	|| (Thermo_Temp_Absence.state     == NULL) )
+	{
+
+		logWarn("thermostat.rules", "SysInit-2 : FIRST SYSTEM INIT DETECTED or NVM CORRUPT Start with default values")
+		Thermo_Time_Matn.postUpdate( 6 * 3600)
+		Thermo_Time_Jour.postUpdate( 8 * 3600)
+		Thermo_Time_Soir.postUpdate(18 * 3600)
+		Thermo_Time_Nuit.postUpdate(22 * 3600)
+		Thermo_Temp_Matn.postUpdate(22)
+		Thermo_Temp_Jour.postUpdate(20)
+		Thermo_Temp_Soir.postUpdate(23)
+		Thermo_Temp_Nuit.postUpdate(18)
+		Thermo_Temp_Absence.postUpdate(15)
+	}
+	else
+	{
+		logWarn("thermostat.rules", "SysInit-2 : NVM PARAMETERS RESTORED Normal start with stored values")
+	}
+
+	logWarn("thermostat.rules", "SysInit-3 : Initialize the day periods times for MMI edition")
+	mn = (Thermo_Time_Jour.state as Number).longValue
+	hr = mn / 3600
+	mn = (mn - hr * 3600) / 60
+	Thermo_Time_Jour_HR_nb.postUpdate(hr)
+	Thermo_Time_Jour_MN_nb.postUpdate(mn)
+	mn = (Thermo_Time_Nuit.state as Number).longValue
+	hr = mn / 3600
+	mn = (mn - hr * 3600) / 60
+	Thermo_Time_Nuit_HR_nb.postUpdate  (hr)
+	Thermo_Time_Nuit_MN_nb.postUpdate  (mn)
+	mn = (Thermo_Time_Matn.state as Number).longValue
+	hr = mn / 3600
+	mn = (mn - hr * 3600) / 60
+	Thermo_Time_Matn_HR_nb.postUpdate  (hr)
+	Thermo_Time_Matn_MN_nb.postUpdate  (mn)
+	mn = (Thermo_Time_Soir.state as Number).longValue
+	hr = mn / 3600
+	mn = (mn - hr * 3600) / 60
+	Thermo_Time_Soir_HR_nb.postUpdate  (hr)
+	Thermo_Time_Soir_MN_nb.postUpdate  (mn)
+
+	logWarn("thermostat.rules", "SysInit-4 : Activate the period times and the current mode")
+	Thermo_Time_Jour_SetOK.postUpdate(3) // To trig Thermo_Time_Jour_SetOK
+	Thermo_Time_Nuit_SetOK.postUpdate(3) // To trig Thermo_Time_Nuit_SetOK
+	Thermo_Time_Matn_SetOK.postUpdate(3) // To trig Thermo_Time_Matn_SetOK
+	Thermo_Time_Soir_SetOK.postUpdate(3) // To trig Thermo_Time_Soir_SetOK
+
+	Thermo_DayPart.postUpdate(OP_UNDEFINED)
+	Thermo_OpMode.postUpdate (OP_MODE_AUTO)	 		
+	
+	SYS_InitLevel.postUpdate(1)
+
+end
+
+////-------------------------------------------------------
+rule "Thermo System : CRON_1_S"
+when Time cron "0/1 * * * * ?"
+then 
+	var int initDone
+	try
+	{
+		initDone = (SYS_InitLevel.state as Number).intValue
+	}
+	catch (Throwable t)
+	{
+		initDone = 0
+	}
+
+	if (initDone > 0) 
+	{
+		ThermoTrigger.sendCommand(0)
+	}
+end
+
+rule "Thermo MMI : MMI Manual Setpoint Changed" when Item Thermo_Temp_Manual_MmiEdit changed
+then
+	if (timer_Setpoint_Editing !== null) timer_Setpoint_Editing.cancel()
+	timer_Setpoint_Editing = createTimer(now.plusSeconds(4))
+	[|
+		var int setpoint = (Thermo_Temp_Manual_MmiEdit.state as Number).intValue
+		Thermo_Temp_Manual.postUpdate(setpoint)
+		if (chThermo_SetPoint_Out.state != setpoint)
+    	{
+        	chThermo_SetPoint_Out.sendCommand(setpoint)
+    	}
+	]
+end
+
+//*****************************************************************************
+rule "Thermo MMI : Mode Selection Changed"
+when Item Thermo_OpMode changed
+then
+	logWarn("thermostat.rules", "Thermo_OpMode changed")
+
+	if ((Thermo_OpMode.state as Number).intValue == OP_MODE_MANUAL)
+	{
+		var int setpoint = 0
+		switch ((Thermo_DayPart.state as Number).intValue)
+		{
+		  //case OP_MODE_MANUAL  
+			case OP_MODE_ABSENCE: setpoint = (Thermo_Temp_Absence.state as Number).intValue
+			case OP_AUTO_MATN	: setpoint = (Thermo_Temp_Matn.state    as Number).intValue	
+			case OP_AUTO_JOUR	: setpoint = (Thermo_Temp_Jour.state    as Number).intValue	
+			case OP_AUTO_SOIR	: setpoint = (Thermo_Temp_Soir.state    as Number).intValue	
+			case OP_AUTO_NUIT	: setpoint = (Thermo_Temp_Nuit.state    as Number).intValue	
+		}
+		Thermo_Temp_Manual_MmiEdit.postUpdate(setpoint)
+	}
+	ThermoTrigger.sendCommand(0)
+end
+
+
+
+
+//*****************************************************************************
+rule "Thermo MMI : Time_Jour_Editing"
+when Item Thermo_Time_Jour_HR_nb received command
+  or Item Thermo_Time_Jour_MN_nb received command
+then
+//	logWarn("thermostat.rules", "Thermo_Time_Jour_Editing command")
+	Thermo_Time_Jour_SetOK.postUpdate(1)
+	if (timer_JourTime_Editing !== null) timer_JourTime_Editing.cancel()
+	timer_JourTime_Editing = createTimer(now.plusSeconds(5))
+	[|
+		Thermo_Time_Jour_SetOK.postUpdate(3)
+//		logWarn("thermostat.rules", "timer_JourTime_Editing expired")
+	]
+end
+
+//---------------------------------------------------------
+rule "Thermo MMI : Button_Jour_SetOK changed"
+when Item Thermo_Time_Jour_SetOK changed
+then
+	logWarn("thermostat.rules", "Thermo_Time_Jour_SetOK changed " + Thermo_Time_Jour_SetOK.state)
+	var int setOkState = (Thermo_Time_Jour_SetOK.state as Number).intValue
+	if(setOkState == 3) // Cancel
+	{
+		var long mn = (Thermo_Time_Jour.state as Number).longValue
+		var long hr = mn / 3600
+		mn = (mn - hr * 3600) / 60
+		Thermo_Time_Jour_HR_nb.postUpdate(hr)
+		Thermo_Time_Jour_MN_nb.postUpdate(mn)
+	}
+	if(setOkState == 2) // OK
+	{
+		Thermo_Time_Jour.postUpdate( (Thermo_Time_Jour_HR_nb.state as Number).longValue * 3600
+		                            +(Thermo_Time_Jour_MN_nb.state as Number).longValue * 60  )
+	}
+	if( (setOkState == 2) || (setOkState == 3))
+	{
+		if (timer_JourTime_Editing !== null) timer_JourTime_Editing.cancel()
+		val String tmp = Thermo_Time_Jour_HR_nb.state.format("%02d") + ":" + Thermo_Time_Jour_MN_nb.state.format("%02d")
+		Thermo_Time_Jour_SetOK.postUpdate(0)
+		Thermo_Time_Jour_str.postUpdate(tmp)
+		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+	}
+end
+//-----------------------------------------------------------------------------
+
+//*****************************************************************************
+rule "Thermo MMI : Time_Nuit_Editing changed"
+when Item Thermo_Time_Nuit_HR_nb received command
+  or Item Thermo_Time_Nuit_MN_nb received command
+then
+//	logWarn("thermostat.rules", "Thermo_Time_Nuit_Editing command")
+	Thermo_Time_Nuit_SetOK.postUpdate(1)
+	if (timer_NuitTime_Editing !== null) timer_NuitTime_Editing.cancel()
+	timer_NuitTime_Editing = createTimer(now.plusSeconds(5))
+	[|
+		Thermo_Time_Nuit_SetOK.postUpdate(3)
+//		logWarn("thermostat.rules", "timer_JourTime_Editing expired")
+	]
+end
+
+//---------------------------------------------------------
+rule "Thermo MMI : Button_Nuit_SetOK changed"
+when Item Thermo_Time_Nuit_SetOK changed
+then
+	logWarn("thermostat.rules", "Thermo_Time_Nuit_SetOK changed " + Thermo_Time_Nuit_SetOK.state)
+	var int setOkState = (Thermo_Time_Nuit_SetOK.state as Number).intValue
+	if(setOkState == 3) // Cancel
+	{
+		var long mn = (Thermo_Time_Nuit.state as Number).longValue
+		var long hr = mn / 3600
+		mn = (mn - hr * 3600) / 60
+		Thermo_Time_Nuit_HR_nb.postUpdate  (hr)
+		Thermo_Time_Nuit_MN_nb.postUpdate  (mn)
+	}
+	if(setOkState == 2) // OK
+	{
+		Thermo_Time_Nuit.postUpdate( (Thermo_Time_Nuit_HR_nb.state as Number).longValue * 3600
+		                            +(Thermo_Time_Nuit_MN_nb.state as Number).longValue * 60  )
+	}
+	if((setOkState == 2) || (setOkState == 3))
+	{
+		if (timer_NuitTime_Editing !== null) timer_NuitTime_Editing.cancel()
+		val String tmp = Thermo_Time_Nuit_HR_nb.state.format("%02d") + ":" + Thermo_Time_Nuit_MN_nb.state.format("%02d")
+		Thermo_Time_Nuit_SetOK.postUpdate(0)
+		Thermo_Time_Nuit_str.postUpdate(tmp)
+		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+	}	
+end
+//-----------------------------------------------------------------------------
+
+//*****************************************************************************
+rule "Thermo MMI : Time_Matn_Editing changed"
+when Item Thermo_Time_Matn_HR_nb received command
+  or Item Thermo_Time_Matn_MN_nb received command
+then
+//	logWarn("thermostat.rules", "Thermo_Time_Matn_Editing command")
+	Thermo_Time_Matn_SetOK.postUpdate(1)
+	if (timer_MatnTime_Editing !== null) timer_MatnTime_Editing.cancel()
+	timer_MatnTime_Editing = createTimer(now.plusSeconds(5))
+	[|
+		Thermo_Time_Matn_SetOK.postUpdate(3)
+//		logWarn("thermostat.rules", "timer_JourTime_Editing expired")
+	]
+end
+
+//---------------------------------------------------------
+rule "Thermo MMI : Button_Matn_SetOK changed"
+when Item Thermo_Time_Matn_SetOK changed
+then
+	logWarn("thermostat.rules", "Thermo_Time_Matn_SetOK changed " + Thermo_Time_Matn_SetOK.state)
+	var int setOkState = (Thermo_Time_Matn_SetOK.state as Number).intValue
+	if(setOkState == 3) // Cancel
+	{
+		var long mn = (Thermo_Time_Matn.state as Number).longValue
+		var long hr = mn / 3600
+		mn = (mn - hr * 3600) / 60
+		Thermo_Time_Matn_HR_nb.postUpdate  (hr)
+		Thermo_Time_Matn_MN_nb.postUpdate  (mn)
+	}
+	if(setOkState == 2) // OK
+	{
+		Thermo_Time_Matn.postUpdate( (Thermo_Time_Matn_HR_nb.state as Number).longValue * 3600
+		                            +(Thermo_Time_Matn_MN_nb.state as Number).longValue * 60  )
+	}
+	if((setOkState == 2) || (setOkState == 3))
+	{
+		if (timer_MatnTime_Editing !== null) timer_MatnTime_Editing.cancel()
+		val String tmp = Thermo_Time_Matn_HR_nb.state.format("%02d") + ":" + Thermo_Time_Matn_MN_nb.state.format("%02d")
+		Thermo_Time_Matn_SetOK.postUpdate(0)
+		Thermo_Time_Matn_str.postUpdate(tmp)
+		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+	}	
+end
+//-----------------------------------------------------------------------------
+
+//*****************************************************************************
+rule "Thermo MMI : Time_Soir_Editing changed"
+when Item Thermo_Time_Soir_HR_nb received command
+  or Item Thermo_Time_Soir_MN_nb received command
+then
+//	logWarn("thermostat.rules", "Thermo_Time_Soir_Editing command")
+	Thermo_Time_Soir_SetOK.postUpdate(1)
+	if (timer_SoirTime_Editing !== null) timer_SoirTime_Editing.cancel()
+	timer_SoirTime_Editing = createTimer(now.plusSeconds(5))
+	[|
+		Thermo_Time_Soir_SetOK.postUpdate(3)
+//		logWarn("thermostat.rules", "timer_JourTime_Editing expired")
+	]
+end
+
+//---------------------------------------------------------
+rule "Thermo MMI : Button_Soir_SetOK changed"
+when Item Thermo_Time_Soir_SetOK changed
+then
+	logWarn("thermostat.rules", "Thermo_Time_Soir_SetOK changed " + Thermo_Time_Soir_SetOK.state)
+	var int setOkState = (Thermo_Time_Soir_SetOK.state as Number).intValue
+	if(setOkState == 3) // Cancel
+	{
+		var long mn = (Thermo_Time_Soir.state as Number).longValue
+		var long hr = mn / 3600
+		mn = (mn - hr * 3600) / 60
+		Thermo_Time_Soir_HR_nb.postUpdate  (hr)
+		Thermo_Time_Soir_MN_nb.postUpdate  (mn)
+	}
+	if(setOkState == 2) // OK
+	{
+		Thermo_Time_Soir.postUpdate( (Thermo_Time_Soir_HR_nb.state as Number).longValue * 3600
+		                            +(Thermo_Time_Soir_MN_nb.state as Number).longValue * 60  )
+	}
+	if((setOkState == 2) || (setOkState == 3))
+	{
+		if (timer_SoirTime_Editing !== null) timer_SoirTime_Editing.cancel()		
+		val String tmp = Thermo_Time_Soir_HR_nb.state.format("%02d") + ":" + Thermo_Time_Soir_MN_nb.state.format("%02d")
+		Thermo_Time_Soir_SetOK.postUpdate(0)
+		Thermo_Time_Soir_str.postUpdate(tmp)
+		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+	}	
+end
+//-----------------------------------------------------------------------------

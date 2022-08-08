@@ -1,0 +1,64 @@
+
+/****************************************************************************************************/
+/*                                                                                                  */
+/****************************************************************************************************/
+Group    gIndoor_Chart                                                                            
+Group    gOutdoor_Chart                                                                            
+Group    gThermo_Params_persist  
+                                                                          
+Number  SYS_InitLevel "sys init level"
+Number  MagicNumber (gThermo_Params_persist)
+Number  ThermoTrigger
+
+Number  Thermo_BattLevel    "Niveau Batterie [%d %%]"  <battery>      
+Switch  Thermo_Command      "Thermost.Cmd [%s]"        <id_switch>
+Switch  Sibir_Real_State    "Sibir State [%s]"         <id_fire>
+
+Number  DBG_Thermo_Command     "DBG Thermo Command    [%.1f]" (gIndoor_Chart)
+Number  DBG_SibSw_Soll_InpCmd  "DBG_SibSw_Soll_InpCmd [%.1f]" (gIndoor_Chart)
+Number  DBG_SibSw_Ist_RealCmd  "DBG_SibSw_Ist_RealCmd [%.1f]" (gIndoor_Chart)
+
+Number  DBG_SibNum_SWITCH_State "DBG_SibNum_SWITCH_State  [%d]" (gIndoor_Chart)
+//mber  DBG_SibNum_SIBIR_State  "DBG_SibNum_SIBIR_State   [%d]" (gIndoor_Chart)
+
+Number  Temp_Chart_Period   "Période d'affich"                               
+
+Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_temperature_outside> (gOutdoor_Chart)
+Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <rain>                     (gOutdoor_Chart)
+Number   Indoor_Measured_Temp    "Température Intérieure [%.1f °C]" <icon_temperature_inside>  (gOutdoor_Chart)
+
+Number   Thermo_OpMode    (gThermo_Params_persist)
+Number   Thermo_DayPart
+String   Thermo_OpMode_DayPart
+
+Number   Thermo_Temp_Absence        "Absence  [%.1f °C]"    <temperature>       (gThermo_Params_persist)
+Number   Thermo_Temp_Manual
+Number   Thermo_Temp_Manual_MmiEdit "Consigne [%.1f °C]"    <setting_finger>
+
+Number   Thermo_Temp_Matn       "Matinée [%.1f °C]"     <sunrise>   (gThermo_Params_persist)
+Number   Thermo_Time_Matn                                           (gThermo_Params_persist)
+String   Thermo_Time_Matn_str   "Début Matinée [%s]"    <sunrise>           
+Number   Thermo_Time_Matn_HR_nb "Heure  [%02d]"         <time>             
+Number   Thermo_Time_Matn_MN_nb "Minute [%02d]"         <time> 
+Number   Thermo_Time_Matn_SetOK "[]"          
+
+Number   Thermo_Temp_Jour       "Journée [%.1f °C]"     <sunday>    (gThermo_Params_persist)
+Number   Thermo_Time_Jour                                           (gThermo_Params_persist)
+String   Thermo_Time_Jour_str   "Début Journée [%s]"    <sunday>  
+Number   Thermo_Time_Jour_HR_nb "Heure  [%02d]"         <time>       
+Number   Thermo_Time_Jour_MN_nb "Minute [%02d]"         <time>       
+Number   Thermo_Time_Jour_SetOK "[]"          
+
+Number   Thermo_Temp_Soir       "Soirée [%.1f °C]"      <sunset>    (gThermo_Params_persist)
+Number   Thermo_Time_Soir                                           (gThermo_Params_persist)
+String   Thermo_Time_Soir_str   "Début Soirée [%s]"     <sunset>       
+Number   Thermo_Time_Soir_HR_nb "Heure  [%02d]"         <time> 
+Number   Thermo_Time_Soir_MN_nb "Minute [%02d]"         <time> 
+Number   Thermo_Time_Soir_SetOK "[]"          
+
+Number   Thermo_Temp_Nuit       "Nuit [%.1f °C]"        <sunight>   (gThermo_Params_persist)
+Number   Thermo_Time_Nuit                                           (gThermo_Params_persist)
+String   Thermo_Time_Nuit_str   "Début Nuit [%s]"       <sunight>              
+Number   Thermo_Time_Nuit_HR_nb "Heure  [%02d]"         <time>              
+Number   Thermo_Time_Nuit_MN_nb "Minute [%02d]"         <time> 
+Number   Thermo_Time_Nuit_SetOK "[]"          
