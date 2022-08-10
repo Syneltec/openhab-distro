@@ -5,11 +5,11 @@ sitemap RMJ label="Gestion SIBIR"
 		Selection item=Thermo_OpMode label="" icon="id_mode" mappings=[3="Automatique (jour/nuit)", 2="Absence (absence)", 1="Manuel (consigne)"] 
 		Setpoint  item=Thermo_Temp_Manual_MmiEdit minValue=5.0 maxValue=30.0 step=1.0 visibility=[Thermo_OpMode==1]
 
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="information"	visibility=[Thermo_DayPart==2]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunrise"		visibility=[Thermo_DayPart==4]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunday"		visibility=[Thermo_DayPart==5]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunset"		visibility=[Thermo_DayPart==6]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunight"		visibility=[Thermo_DayPart==7]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="icon_info_absent"	visibility=[Thermo_DayPart==2]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunrise"          visibility=[Thermo_DayPart==4]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunday"           visibility=[Thermo_DayPart==5]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunset"           visibility=[Thermo_DayPart==6]
+	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunight"          visibility=[Thermo_DayPart==7]
 
 	    Text      item=Indoor_Measured_Temp
 	}
@@ -21,10 +21,10 @@ sitemap RMJ label="Gestion SIBIR"
 		Text item=Outdoor_Weather_Humid	
 	}
 
-	Frame label="Utilitaires" icon="icon_utilities"
+	Frame label="Utilitaires"
 	{
 
-		Text label="Réglages" icon="settings"
+		Text label="Réglages" icon="icon_settings"
 		{
 			Frame label="Horaires" icon="time"
 			{
@@ -65,11 +65,11 @@ sitemap RMJ label="Gestion SIBIR"
 
 		}
 	
-		Text label="Graphiques" icon="chart"
+		Text label="Graphiques" icon="icon_chart"
 		{
 			Frame 
 			{
-				Switch item=Temp_Chart_Period label="" icon="chart" mappings=[0="1h",1="8h", 2="1j", 3="3j",4="1s"]
+				Switch item=Temp_Chart_Period label="" icon="icon_chart" mappings=[0="1h",1="8h", 2="1j", 3="3j",4="1s"]
 			}
 			Frame 
 			{
@@ -105,7 +105,7 @@ sitemap RMJ label="Gestion SIBIR"
 				Text	item=Sibir_Real_State
 				
 			    Switch  item=MyTestSwitch  
-			    Switch   item=MyTestSwitch2
+			    
 			}
 
 		}

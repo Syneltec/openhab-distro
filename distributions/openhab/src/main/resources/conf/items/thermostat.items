@@ -23,9 +23,9 @@ Number  DBG_SibNum_SWITCH_State "DBG_SibNum_SWITCH_State  [%d]" (gIndoor_Chart)
 
 Number  Temp_Chart_Period   "Période d'affich"                               
 
-Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_temperature_outside> (gOutdoor_Chart)
-Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <rain>                     (gOutdoor_Chart)
-Number   Indoor_Measured_Temp    "Température Intérieure [%.1f °C]" <icon_temperature_inside>  (gOutdoor_Chart)
+Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_temperature_outside>   (gOutdoor_Chart)
+Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <icon_humidity>            //(gOutdoor_Chart)
+Number   Indoor_Measured_Temp    "Température Intérieure [%.1f °C]" <icon_temperature_inside>    (gOutdoor_Chart)
 
 Number   Thermo_OpMode    (gThermo_Params_persist)
 Number   Thermo_DayPart
@@ -33,7 +33,7 @@ String   Thermo_OpMode_DayPart
 
 Number   Thermo_Temp_Absence        "Absence  [%.1f °C]"    <temperature>       (gThermo_Params_persist)
 Number   Thermo_Temp_Manual
-Number   Thermo_Temp_Manual_MmiEdit "Consigne [%.1f °C]"    <setting_finger>
+Number   Thermo_Temp_Manual_MmiEdit "Consigne [%.1f °C]"    <icon_finger>
 
 Number   Thermo_Temp_Matn       "Matinée [%.1f °C]"     <sunrise>   (gThermo_Params_persist)
 Number   Thermo_Time_Matn                                           (gThermo_Params_persist)

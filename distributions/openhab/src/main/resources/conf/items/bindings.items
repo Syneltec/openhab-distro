@@ -1,21 +1,21 @@
 /* Physical Linked Items */ 
 
 // Thermostat SRT 321             
-Switch  chThermo_HeaterCmd   "chThermo_HeaterCmd"          {channel="zwave:device:ebacb1b1ab:node2:switch_binary"}
-Number  chThermo_BattLevel   "chThermo_BattLevel [%d %%]"  {channel="zwave:device:ebacb1b1ab:node2:battery-level"}
-Number  chThermo_MeasTemp    "chThermo_MeasTemp [%.1f °C]" {channel="zwave:device:ebacb1b1ab:node2:sensor_temperature"}
+Switch  chThermo_HeaterCmd   "chThermo_HeaterCmd"          {channel="zwave:device:65a3c6a2d7:node3:switch_binary"}
+Number  chThermo_BattLevel   "chThermo_BattLevel [%d %%]"  {channel="zwave:device:65a3c6a2d7:node3:battery-level"}
+Number  chThermo_MeasTemp    "chThermo_MeasTemp [%.1f °C]" {channel="zwave:device:65a3c6a2d7:node3:sensor_temperature"}
 
-Number  chThermo_SetPoint_Inp "chThermo_SetPoint_Inp [%.1f °C]" (gOutdoor_Chart) {channel="zwave:device:ebacb1b1ab:node2:thermostat_setpoint_heating"}
-Number  chThermo_SetPoint_Out "chThermo_SetPoint_Out [%.1f °C]" (gOutdoor_Chart) {channel="zwave:device:ebacb1b1ab:node2:thermostat_setpoint_heating"}
-
+Number  chThermo_SetPoint_Inp "chThermo_SetPoint_Inp [%.1f °C]" (gOutdoor_Chart) {channel="zwave:device:65a3c6a2d7:node3:thermostat_setpoint_heating"}
+Number  chThermo_SetPoint_Out "chThermo_SetPoint_Out [%.1f °C]" (gOutdoor_Chart) {channel="zwave:device:65a3c6a2d7:node3:thermostat_setpoint_heating"}
+                                                                                           
 // Relais Sibir pour commande chauffage   
-Switch  chSibSwBin_Soll_InpCmd   "chSibSwBin_Soll_InpCmd"    {channel="zwave:device:ebacb1b1ab:node3:switch_binary1"}
-Switch  chSibSwBin_Ist_RealCmd   "chSibSwBin_Ist_RealCmd"    {channel="zwave:device:ebacb1b1ab:node3:switch_binary2"}
+Switch  chSibSwBin_Soll_InpCmd   "chSibSwBin_Soll_InpCmd"    {channel="zwave:device:65a3c6a2d7:node2:switch_binary1"}
+Switch  chSibSwBin_Ist_RealCmd   "chSibSwBin_Ist_RealCmd"    {channel="zwave:device:65a3c6a2d7:node2:switch_binary2"}
 
 // DEBUG Relais Sibir
-Number  chSibSwNum_SWITCH_State "chSibSwNum_SWITCH_State  [%d]" {channel="zwave:device:ebacb1b1ab:node3:sensor_general5"}
-Number  chSibSwNum_SIBIR_State  "chSibSwNum_SIBIR_State   [%d]" {channel="zwave:device:ebacb1b1ab:node3:sensor_general6"}
-Number  chSibSwNum_Intern_Timer "chSibSwNum_Intern_Timer  [%d]" {channel="zwave:device:ebacb1b1ab:node3:meter_pulse"}
+Number  chSibSwNum_SWITCH_State "chSibSwNum_SWITCH_State  [%d]"  {channel="zwave:device:65a3c6a2d7:node2:sensor_general5"}
+Number  chSibSwNum_SIBIR_State  "chSibSwNum_SIBIR_State   [%d]"  {channel="zwave:device:65a3c6a2d7:node2:sensor_general6"}
+Number  chSibSwNum_Intern_Timer "chSibSwNum_Intern_Timer  [%d]"  {channel="zwave:device:65a3c6a2d7:node2:meter_pulse"}
 
 // Yahoo Weather
 Number   chYahooWeather_Temp  "chYahooWeather_Temp"     {channel="openweathermap:weather-and-forecast:e80926bd5c:local:current#temperature"}
@@ -25,3 +25,6 @@ String   localStationId       "ID [%s]"                             { channel="o
 String   localStationName     "Name [%s]"                           { channel="openweathermap:weather-api:03ca069431:station#name" }
 Location localStationLocation "Location [%2$s°N %3$s°E]" <location> { channel="openweathermap:weather-api:03ca069431:station#location" }
 
+
+// TEST
+Switch   MyTestSwitch   // "Secure ASR switch"  {channel="zwave:device:ebacb1b1ab:node5:switch_binary"}
