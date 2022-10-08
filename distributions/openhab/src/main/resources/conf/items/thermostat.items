@@ -2,8 +2,8 @@
 /****************************************************************************************************/
 /*                                                                                                  */
 /****************************************************************************************************/
-Group    gIndoor_Chart                                                                            
-Group    gOutdoor_Chart                                                                            
+Group    gDebugChart                                                                            
+Group    gTemperaturesChart                                                                            
 Group    gThermo_Params_persist  
                                                                           
 Number  SYS_InitLevel "sys init level"
@@ -14,18 +14,16 @@ Number  Thermo_BattLevel    "Niveau Batterie [%d %%]"  <battery>
 Switch  Thermo_Command      "Thermost.Cmd [%s]"        <id_switch>
 Switch  Sibir_Real_State    "Sibir State [%s]"         <id_fire>
 
-Number  DBG_Thermo_Command     "DBG Thermo Command    [%.1f]" (gIndoor_Chart)
-Number  DBG_SibSw_Soll_InpCmd  "DBG_SibSw_Soll_InpCmd [%.1f]" (gIndoor_Chart)
-Number  DBG_SibSw_Ist_RealCmd  "DBG_SibSw_Ist_RealCmd [%.1f]" (gIndoor_Chart)
-
-Number  DBG_SibNum_SWITCH_State "DBG_SibNum_SWITCH_State  [%d]" (gIndoor_Chart)
-//mber  DBG_SibNum_SIBIR_State  "DBG_SibNum_SIBIR_State   [%d]" (gIndoor_Chart)
+Number  DBG_Thermo_Command      "DBG Thermo REQ [%.1f]" (gDebugChart)
+Number  DBG_SibSw_Soll_InpCmd   "DBG SibSw  REQ [%.1f]" (gDebugChart)
+Number  DBG_SibSw_Ist_RealCmd   "DBG SibSw  RES [%.1f]" (gDebugChart)
+Number  DBG_SibNum_SWITCH_State "DBG SibSw STATE  [%d]" (gDebugChart)
 
 Number  Temp_Chart_Period   "Période d'affich"                               
 
-Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_temperature_outside>   (gOutdoor_Chart)
-Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <icon_humidity>            //(gOutdoor_Chart)
-Number   Indoor_Measured_Temp    "Température Intérieure [%.1f °C]" <icon_temperature_inside>    (gOutdoor_Chart)
+Number   Indoor_Measured_Temp    "Température Intérieure [%.1f °C]" <icon_temperature_inside>    (gTemperaturesChart)
+Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_temperature_outside>   (gTemperaturesChart)
+Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <icon_humidity>            //(gTemperaturesChart)
 
 Number   Thermo_OpMode    (gThermo_Params_persist)
 Number   Thermo_DayPart

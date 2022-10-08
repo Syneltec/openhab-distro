@@ -16,7 +16,7 @@ sitemap RMJ label="Gestion SIBIR"
 
 	Frame label="Informations"
 	{
-		Text item=Thermo_BattLevel
+		Text item=chThermo_BattLevel
 		Text item=Outdoor_Weather_Temp	
 		Text item=Outdoor_Weather_Humid	
 	}
@@ -71,21 +71,21 @@ sitemap RMJ label="Gestion SIBIR"
 			{
 				Switch item=Temp_Chart_Period label="" icon="icon_chart" mappings=[0="1h",1="8h", 2="1j", 3="3j",4="1s"]
 			}
-			Frame 
+			Frame label="Températures"
 			{
-				Chart item=gIndoor_Chart period=h   refresh=60000  visibility=[Temp_Chart_Period==0, Temp_Chart_Period=="NULL"]
-				Chart item=gIndoor_Chart period=8h  refresh=240000 visibility=[Temp_Chart_Period==1]
-				Chart item=gIndoor_Chart period=D   refresh=480000 visibility=[Temp_Chart_Period==2]
-				Chart item=gIndoor_Chart period=3D  refresh=480000 visibility=[Temp_Chart_Period==3]
-				Chart item=gIndoor_Chart period=W   refresh=480000 visibility=[Temp_Chart_Period==4]
+				Chart item=gTemperaturesChart period=h  refresh=60000  visibility=[Temp_Chart_Period==0, Temp_Chart_Period=="NULL"]
+				Chart item=gTemperaturesChart period=8h refresh=240000 visibility=[Temp_Chart_Period==1]
+				Chart item=gTemperaturesChart period=D  refresh=480000 visibility=[Temp_Chart_Period==2]
+				Chart item=gTemperaturesChart period=3D refresh=480000 visibility=[Temp_Chart_Period==3]
+				Chart item=gTemperaturesChart period=W  refresh=480000 visibility=[Temp_Chart_Period==4]
 			}
-			Frame 
+			Frame label="Debug Infos"
 			{
-				Chart item=gOutdoor_Chart period=h  refresh=60000  visibility=[Temp_Chart_Period==0, Temp_Chart_Period=="NULL"]
-				Chart item=gOutdoor_Chart period=8h refresh=240000 visibility=[Temp_Chart_Period==1]
-				Chart item=gOutdoor_Chart period=D  refresh=480000 visibility=[Temp_Chart_Period==2]
-				Chart item=gOutdoor_Chart period=3D refresh=480000 visibility=[Temp_Chart_Period==3]
-				Chart item=gOutdoor_Chart period=W  refresh=480000 visibility=[Temp_Chart_Period==4]
+				Chart item=gDebugChart period=h   refresh=60000  visibility=[Temp_Chart_Period==0, Temp_Chart_Period=="NULL"]
+				Chart item=gDebugChart period=8h  refresh=240000 visibility=[Temp_Chart_Period==1]
+				Chart item=gDebugChart period=D   refresh=480000 visibility=[Temp_Chart_Period==2]
+				Chart item=gDebugChart period=3D  refresh=480000 visibility=[Temp_Chart_Period==3]
+				Chart item=gDebugChart period=W   refresh=480000 visibility=[Temp_Chart_Period==4]
 			}
 			Text label="Debug" 
 			{

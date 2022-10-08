@@ -50,8 +50,18 @@ end
 
 //*****************************************************************************
 
-rule "chThermo_BattLevel" when Item chThermo_BattLevel    received update  then Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	end
-rule "chThermo_MeasTemp"  when Item chThermo_MeasTemp     received update  then Indoor_Measured_Temp.postUpdate (chThermo_MeasTemp.state) 	end
+//rule "chThermo_BattLevel" when Item chThermo_BattLevel    changed          then Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	end
+//rule "chThermo_BattLevel" when Item chThermo_BattLevel    received update  then Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	end
+rule "chThermo_MeasTemp"  when Item chThermo_MeasTemp     changed          
+then 
+    Indoor_Measured_Temp.postUpdate (chThermo_MeasTemp.state)
+    Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state)
+end
+rule "chThermo_MeasTemp"  when Item chThermo_MeasTemp     received update  
+then
+    Indoor_Measured_Temp.postUpdate (chThermo_MeasTemp.state)
+    Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state)
+end
 
 //*****************************************************************************
 // Debug purpose : Chart 
@@ -202,7 +212,7 @@ then
 
 	if (initDone > 0) 
 	{
-		ThermoTrigger.sendCommand(0)
+		ThermoTrigger.sendCommand(0)		
 	}
 end
 

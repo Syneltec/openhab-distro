@@ -9,7 +9,7 @@ Strategies
 Items 
 {
 	// let's only store temperature values in rrd
-	gIndoor_Chart*, gOutdoor_Chart* : strategy = everyMinute, everyChange
+	gDebugChart*, gTemperaturesChart* : strategy = everyMinute, everyChange
 	gThermo_Params_persist* : strategy = everyChange, restoreOnStartup
 }
 
