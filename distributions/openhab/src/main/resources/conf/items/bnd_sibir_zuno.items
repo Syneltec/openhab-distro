@@ -1,0 +1,9 @@
+// Relais Sibir pour commande chauffage   
+Switch  chSibSwBin_Soll_InpCmd   "chSibSwBin_Soll_InpCmd"    {channel="zwave:device:65a3c6a2d7:node2:switch_binary1"}
+Switch  chSibSwBin_Ist_RealCmd   "chSibSwBin_Ist_RealCmd"    {channel="zwave:device:65a3c6a2d7:node2:switch_binary2"}
+
+// DEBUG Relais Sibir
+Number  chSibSwNum_SWITCH_State "chSibSwNum_SWITCH_State  [%d]"  {channel="zwave:device:65a3c6a2d7:node2:sensor_general5"}
+Number  chSibSwNum_SIBIR_State  "chSibSwNum_SIBIR_State   [%d]"  {channel="zwave:device:65a3c6a2d7:node2:sensor_general6"}
+Number  chSibSwNum_Intern_Timer "chSibSwNum_Intern_Timer  [%d]"  {channel="zwave:device:65a3c6a2d7:node2:meter_pulse"}
+
