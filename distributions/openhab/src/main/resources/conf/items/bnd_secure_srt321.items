@@ -1,7 +1,7 @@
 // Thermostat SRT 321             
-Switch  chThermo_HeaterCmd   "chThermo_HeaterCmd"          {channel="zwave:device:65a3c6a2d7:node3:switch_binary"}
-Number  chThermo_BattLevel   "chThermo_BattLevel [%.0f %%]"  {channel="zwave:device:65a3c6a2d7:node3:battery-level"}
-Number  chThermo_MeasTemp    "chThermo_MeasTemp [%.1f °C]" {channel="zwave:device:65a3c6a2d7:node3:sensor_temperature"}
+Switch  chThermo_HeaterCmd   "chThermo_HeaterCmd"           {channel="zwave:device:65a3c6a2d7:node3:switch_binary"}
+Number  chThermo_BattLevel   "chThermo_BattLevel [%.1f %%]" {channel="zwave:device:65a3c6a2d7:node3:battery-level"}
+Number  chThermo_MeasTemp    "chThermo_MeasTemp [%.1f °C]"  {channel="zwave:device:65a3c6a2d7:node3:sensor_temperature"}
 
 Number  chThermo_SetPoint_Out "Thermo Consigne REQ [%.1f °C]" (gTemperaturesChart) {channel="zwave:device:65a3c6a2d7:node3:thermostat_setpoint_heating"}
 Number  chThermo_SetPoint_Inp "Thermo Consigne ACK [%.1f °C]" (gTemperaturesChart) {channel="zwave:device:65a3c6a2d7:node3:thermostat_setpoint_heating"}
