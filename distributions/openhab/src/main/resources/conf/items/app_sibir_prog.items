@@ -26,12 +26,19 @@ Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_tem
 Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <icon_humidity>            //(gTemperaturesChart)
 
 Number   Thermo_OpMode    (gThermo_Params_persist)
-Number   Thermo_DayPart
-String   Thermo_OpMode_DayPart
+Number   Thermo_OpPart 
+String   Thermo_OpMode_OpPart 
 
-Number   Thermo_Temp_Absence        "Absence  [%.1f °C]"    <temperature>       (gThermo_Params_persist)
 Number   Thermo_Temp_Manual
-Number   Thermo_Temp_Manual_MmiEdit "Consigne [%.1f °C]"    <icon_finger>
+Number   Thermo_Temp_Manual_MmiEdit "Consigne [%.1f °C]" <icon_finger>
+
+Number   Thermo_Time_AtAbscSetd /* heure à laquelle le mode abscence a été activé */ 
+Number   Thermo_Temp_Absc       "Absence  [%.1f °C]"     <temperature> (gThermo_Params_persist)
+Number   Thermo_Time_Absc                                              (gThermo_Params_persist)
+String   Thermo_Time_Absc_str   "Absence jusqu'à [%s]"  <sunrise>           
+Number   Thermo_Time_Absc_HR_nb "Heure  [%02d]"         <time>             
+Number   Thermo_Time_Absc_MN_nb "Minute [%02d]"         <time> 
+Number   Thermo_Time_Absc_SetOK "[]"          
 
 Number   Thermo_Temp_Matn       "Matinée [%.1f °C]"     <sunrise>   (gThermo_Params_persist)
 Number   Thermo_Time_Matn                                           (gThermo_Params_persist)

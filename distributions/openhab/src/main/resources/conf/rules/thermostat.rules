@@ -1,4 +1,4 @@
-
+import java.util.Calendar
 import java.util.concurrent.locks.ReentrantLock
 val ReentrantLock TheLock = new ReentrantLock
 
@@ -12,6 +12,11 @@ val int OP_AUTO_JOUR      = 5
 val int OP_AUTO_SOIR      = 6
 val int OP_AUTO_NUIT      = 7
 
+val int ABS_INFINITE      = 21
+val int ABS_TEMPORISED    = 22
+val int ABS_EDITING       = 23
+
+var Timer 	timer_AbscTime_Editing = null    
 var Timer 	timer_MatnTime_Editing = null    
 var Timer 	timer_JourTime_Editing = null    
 var Timer 	timer_SoirTime_Editing = null    
@@ -27,64 +32,32 @@ rule "Weather Outdoor Humid" when Item chYahooWeather_Humid	changed
 	then Outdoor_Weather_Humid.postUpdate	(chYahooWeather_Humid.state)
 end
 
-/*
-rule "chThermo_SetPoint_Inp" when Item chThermo_SetPoint_Inp received update  
-then // Overwrite an eventual modification from the device
-	switch ((Thermo_OpMode.state as Number).intValue)
-	{
-		case OP_MODE_AUTO : // Automatic Mode
-		{
-			switch ((Thermo_DayPart.state  as Number).intValue)
-			{
-				case OP_AUTO_MATN : Thermo_Temp_Matn.postUpdate(chThermo_SetPoint_Inp.state)
-				case OP_AUTO_JOUR : Thermo_Temp_Jour.postUpdate(chThermo_SetPoint_Inp.state)
-				case OP_AUTO_SOIR : Thermo_Temp_Soir.postUpdate(chThermo_SetPoint_Inp.state)
-				case OP_AUTO_NUIT : Thermo_Temp_Nuit.postUpdate(chThermo_SetPoint_Inp.state)
-			}
-		}
-		case OP_MODE_MANUAL  : Thermo_Temp_Manual_MmiEdit.postUpdate(chThermo_SetPoint_Inp.state)
-		case OP_MODE_ABSENCE : Thermo_Temp_Absence.postUpdate        (chThermo_SetPoint_Inp.state)
-	}
-end
-*/
-
 //*****************************************************************************
+rule "chThermo_BattLevel" when Item chThermo_BattLevel    changed          
+then 
+    Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	
+end
 
-//rule "chThermo_BattLevel" when Item chThermo_BattLevel    changed          then Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	end
-//rule "chThermo_BattLevel" when Item chThermo_BattLevel    received update  then Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	end
 rule "chThermo_MeasTemp"  when Item chThermo_MeasTemp     changed          
 then 
     Indoor_Measured_Temp.postUpdate (chThermo_MeasTemp.state)
-    Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state)
-end
-rule "chThermo_MeasTemp"  when Item chThermo_MeasTemp     received update  
-then
-    Indoor_Measured_Temp.postUpdate (chThermo_MeasTemp.state)
-    Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state)
 end
 
 //*****************************************************************************
 // Debug purpose : Chart 
 
 rule "DBG_chSibSwNum_SWITCH_State"  when Item chSibSwNum_SWITCH_State	changed  
-	then DBG_SibNum_SWITCH_State.postUpdate	((chSibSwNum_SWITCH_State.state as Number).intValue) 	
+then 
+    DBG_SibNum_SWITCH_State.postUpdate	((chSibSwNum_SWITCH_State.state as Number).intValue) 	
 end
-
-//rule "DBG_chSibSwNum_SIBIR_State"  when Item chSibSwNum_SIBIR_State	changed  
-//	then DBG_SibNum_SIBIR_State.postUpdate	((chSibSwNum_SIBIR_State.state as Number).intValue) 	
-//end
 
 rule "DBG System started" when System started
 then 
 	DBG_SibNum_SWITCH_State.postUpdate	(0) 	
-//	DBG_SibNum_SIBIR_State.postUpdate	(0) 
+
 	DBG_Thermo_Command.postUpdate   (0.0)	// false -> 20
 	DBG_SibSw_Ist_RealCmd.postUpdate(0.5)	// false -> 20
 	DBG_SibSw_Soll_InpCmd.postUpdate(1.0)	// false -> 20
-
-
-
-
 end
 
 //*****************************************************************************
@@ -124,9 +97,7 @@ end
 //*****************************************************************************
 //*****************************************************************************
 //*****************************************************************************
-rule "Thermo System : System started"
-when
-	System started
+rule "Thermo System : System started"  when System started
 then
 	var long hr
 	var long mn
@@ -141,20 +112,20 @@ then
 	|| (Thermo_Time_Jour.state   == NULL) || (Thermo_Temp_Jour.state   == NULL)
 	|| (Thermo_Time_Soir.state   == NULL) || (Thermo_Temp_Soir.state   == NULL)
 	|| (Thermo_Time_Nuit.state   == NULL) || (Thermo_Temp_Nuit.state   == NULL)
-	|| (Thermo_OpMode.state == NULL)   
-	|| (Thermo_Temp_Absence.state     == NULL) )
+	|| (Thermo_Time_Absc.state   == NULL) || (Thermo_Temp_Absc.state   == NULL)
+	|| (Thermo_OpMode.state      == NULL) )  
 	{
-
 		logWarn("thermostat.rules", "SysInit-2 : FIRST SYSTEM INIT DETECTED or NVM CORRUPT Start with default values")
 		Thermo_Time_Matn.postUpdate( 6 * 3600)
 		Thermo_Time_Jour.postUpdate( 8 * 3600)
 		Thermo_Time_Soir.postUpdate(18 * 3600)
 		Thermo_Time_Nuit.postUpdate(22 * 3600)
+		Thermo_Time_Absc.postUpdate(23 * 3600)
 		Thermo_Temp_Matn.postUpdate(22)
 		Thermo_Temp_Jour.postUpdate(20)
 		Thermo_Temp_Soir.postUpdate(23)
 		Thermo_Temp_Nuit.postUpdate(18)
-		Thermo_Temp_Absence.postUpdate(15)
+		Thermo_Temp_Absc.postUpdate(15)
 	}
 	else
 	{
@@ -167,30 +138,42 @@ then
 	mn = (mn - hr * 3600) / 60
 	Thermo_Time_Jour_HR_nb.postUpdate(hr)
 	Thermo_Time_Jour_MN_nb.postUpdate(mn)
+	
 	mn = (Thermo_Time_Nuit.state as Number).longValue
 	hr = mn / 3600
 	mn = (mn - hr * 3600) / 60
 	Thermo_Time_Nuit_HR_nb.postUpdate  (hr)
 	Thermo_Time_Nuit_MN_nb.postUpdate  (mn)
-	mn = (Thermo_Time_Matn.state as Number).longValue
+	
+	mn = (Thermo_Time_Matn.state as Number).longValue	
 	hr = mn / 3600
 	mn = (mn - hr * 3600) / 60
 	Thermo_Time_Matn_HR_nb.postUpdate  (hr)
 	Thermo_Time_Matn_MN_nb.postUpdate  (mn)
+	
 	mn = (Thermo_Time_Soir.state as Number).longValue
 	hr = mn / 3600
 	mn = (mn - hr * 3600) / 60
 	Thermo_Time_Soir_HR_nb.postUpdate  (hr)
 	Thermo_Time_Soir_MN_nb.postUpdate  (mn)
 
+	mn = (Thermo_Time_Absc.state as Number).longValue
+	hr = mn / 3600
+	mn = (mn - hr * 3600) / 60
+	Thermo_Time_Absc_HR_nb.postUpdate  (hr)
+	Thermo_Time_Absc_MN_nb.postUpdate  (mn)
+
 	logWarn("thermostat.rules", "SysInit-4 : Activate the period times and the current mode")
 	Thermo_Time_Jour_SetOK.postUpdate(3) // To trig Thermo_Time_Jour_SetOK
 	Thermo_Time_Nuit_SetOK.postUpdate(3) // To trig Thermo_Time_Nuit_SetOK
 	Thermo_Time_Matn_SetOK.postUpdate(3) // To trig Thermo_Time_Matn_SetOK
 	Thermo_Time_Soir_SetOK.postUpdate(3) // To trig Thermo_Time_Soir_SetOK
+	Thermo_Time_Absc_SetOK.postUpdate(3) // To trig Thermo_Time_Absc_SetOK
 
-	Thermo_DayPart.postUpdate(OP_UNDEFINED)
-	Thermo_OpMode.postUpdate (OP_MODE_AUTO)	 		
+    Thermo_Time_AtAbscSetd.postUpdate(0)
+    
+	Thermo_OpMode.postUpdate(OP_MODE_AUTO)	 
+	Thermo_OpPart.postUpdate(OP_UNDEFINED)
 	
 	SYS_InitLevel.postUpdate(1)
 
@@ -223,10 +206,6 @@ then
 	[|
 		var int setpoint = (Thermo_Temp_Manual_MmiEdit.state as Number).intValue
 		Thermo_Temp_Manual.postUpdate(setpoint)
-		if (chThermo_SetPoint_Out.state != setpoint)
-    	{
-        	chThermo_SetPoint_Out.sendCommand(setpoint)
-    	}
 	]
 end
 
@@ -239,10 +218,10 @@ then
 	if ((Thermo_OpMode.state as Number).intValue == OP_MODE_MANUAL)
 	{
 		var int setpoint = 0
-		switch ((Thermo_DayPart.state as Number).intValue)
+		switch ((Thermo_OpPart.state as Number).intValue)
 		{
 		  //case OP_MODE_MANUAL  
-			case OP_MODE_ABSENCE: setpoint = (Thermo_Temp_Absence.state as Number).intValue
+			case OP_MODE_ABSENCE: setpoint = (Thermo_Temp_Absc.state    as Number).intValue
 			case OP_AUTO_MATN	: setpoint = (Thermo_Temp_Matn.state    as Number).intValue	
 			case OP_AUTO_JOUR	: setpoint = (Thermo_Temp_Jour.state    as Number).intValue	
 			case OP_AUTO_SOIR	: setpoint = (Thermo_Temp_Soir.state    as Number).intValue	
@@ -250,10 +229,30 @@ then
 		}
 		Thermo_Temp_Manual_MmiEdit.postUpdate(setpoint)
 	}
-	ThermoTrigger.sendCommand(0)
+
+	if ((Thermo_OpMode.state as Number).intValue == OP_MODE_ABSENCE)
+	{
+        val Calendar  cal = Calendar.getInstance    
+        val long h        = cal.get(Calendar.HOUR_OF_DAY)
+        val long m        = cal.get(Calendar.MINUTE)
+        val long s        = cal.get(Calendar.SECOND)
+
+        val long currTime = (60 * h + m) * 60 + s
+	    Thermo_Time_AtAbscSetd.postUpdate(currTime)
+	    Thermo_OpPart.postUpdate(ABS_TEMPORISED)
+	}
+
+//	ThermoTrigger.sendCommand(0)
 end
 
-
+////*****************************************************************************
+//rule "Thermo MMI : Part Selection Changed"
+//when Item Thermo_OpPart changed
+//then
+//	logWarn("thermostat.rules", "Thermo_OpPart changed")
+//
+//	ThermoTrigger.sendCommand(0)
+//end
 
 
 //*****************************************************************************
@@ -296,7 +295,7 @@ then
 		val String tmp = Thermo_Time_Jour_HR_nb.state.format("%02d") + ":" + Thermo_Time_Jour_MN_nb.state.format("%02d")
 		Thermo_Time_Jour_SetOK.postUpdate(0)
 		Thermo_Time_Jour_str.postUpdate(tmp)
-		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+		//Thermo_OpMode_OpPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
 	}
 end
 //-----------------------------------------------------------------------------
@@ -341,7 +340,7 @@ then
 		val String tmp = Thermo_Time_Nuit_HR_nb.state.format("%02d") + ":" + Thermo_Time_Nuit_MN_nb.state.format("%02d")
 		Thermo_Time_Nuit_SetOK.postUpdate(0)
 		Thermo_Time_Nuit_str.postUpdate(tmp)
-		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+		//Thermo_OpMode_OpPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
 	}	
 end
 //-----------------------------------------------------------------------------
@@ -386,7 +385,7 @@ then
 		val String tmp = Thermo_Time_Matn_HR_nb.state.format("%02d") + ":" + Thermo_Time_Matn_MN_nb.state.format("%02d")
 		Thermo_Time_Matn_SetOK.postUpdate(0)
 		Thermo_Time_Matn_str.postUpdate(tmp)
-		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+		//Thermo_OpMode_OpPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
 	}	
 end
 //-----------------------------------------------------------------------------
@@ -431,7 +430,52 @@ then
 		val String tmp = Thermo_Time_Soir_HR_nb.state.format("%02d") + ":" + Thermo_Time_Soir_MN_nb.state.format("%02d")
 		Thermo_Time_Soir_SetOK.postUpdate(0)
 		Thermo_Time_Soir_str.postUpdate(tmp)
-		//Thermo_OpMode_DayPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+		//Thermo_OpMode_OpPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
 	}	
 end
 //-----------------------------------------------------------------------------
+//*****************************************************************************
+rule "Thermo MMI : Time_Absc_Editing changed"
+when Item Thermo_Time_Absc_HR_nb received command
+  or Item Thermo_Time_Absc_MN_nb received command
+then
+//	logWarn("thermostat.rules", "Thermo_Time_Absc_Editing command")
+	Thermo_Time_Absc_SetOK.postUpdate(1)
+	if (timer_AbscTime_Editing !== null) timer_AbscTime_Editing.cancel()
+	timer_AbscTime_Editing = createTimer(now.plusSeconds(5))
+	[|
+		Thermo_Time_Absc_SetOK.postUpdate(3)
+//		logWarn("thermostat.rules", "timer_AbscTime_Editing expired")
+	]
+end
+
+//---------------------------------------------------------
+rule "Thermo MMI : Button_Absc_SetOK changed"
+when Item Thermo_Time_Absc_SetOK changed
+then
+	logWarn("thermostat.rules", "Thermo_Time_Absc_SetOK changed " + Thermo_Time_Absc_SetOK.state)
+	var int setOkState = (Thermo_Time_Absc_SetOK.state as Number).intValue
+	if(setOkState == 3) // Cancel
+	{
+		var long mn = (Thermo_Time_Absc.state as Number).longValue
+		var long hr = mn / 3600
+		mn = (mn - hr * 3600) / 60
+		Thermo_Time_Absc_HR_nb.postUpdate  (hr)
+		Thermo_Time_Absc_MN_nb.postUpdate  (mn)
+	}
+	if(setOkState == 2) // OK
+	{
+		Thermo_Time_Absc.postUpdate( (Thermo_Time_Absc_HR_nb.state as Number).longValue * 3600
+		                            +(Thermo_Time_Absc_MN_nb.state as Number).longValue * 60  )
+	}
+	if((setOkState == 2) || (setOkState == 3))
+	{
+		if (timer_AbscTime_Editing !== null) timer_AbscTime_Editing.cancel()		
+		val String tmp = Thermo_Time_Absc_HR_nb.state.format("%02d") + ":" + Thermo_Time_Absc_MN_nb.state.format("%02d")
+		Thermo_Time_Absc_SetOK.postUpdate(0)
+		Thermo_Time_Absc_str.postUpdate(tmp)
+		//Thermo_OpMode_OpPart.postUpdate(OP_MODE_AUTO) // Force updates in script handle j/n
+	}	
+end
+//-----------------------------------------------------------------------------
+

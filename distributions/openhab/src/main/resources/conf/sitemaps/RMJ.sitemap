@@ -2,21 +2,38 @@ sitemap RMJ label="Gestion SIBIR"
 {
 	Frame label="Mode de Fonctionnement"
 	{
-		Selection item=Thermo_OpMode label="" icon="id_mode" mappings=[3="Automatique (jour/nuit)", 2="Absence (absence)", 1="Manuel (consigne)"] 
+		Selection item=Thermo_OpMode label="" icon="id_mode" mappings=[3="Automatique (jour/nuit)", 2="Absence                       ", 1="Manuel (consigne)"] 
 		Setpoint  item=Thermo_Temp_Manual_MmiEdit minValue=5.0 maxValue=30.0 step=1.0 visibility=[Thermo_OpMode==1]
 
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="icon_info_absent"	visibility=[Thermo_DayPart==2]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunrise"          visibility=[Thermo_DayPart==4]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunday"           visibility=[Thermo_DayPart==5]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunset"           visibility=[Thermo_DayPart==6]
-	    Text      item=Thermo_OpMode_DayPart label="[ %s ]" icon="sunight"          visibility=[Thermo_DayPart==7]
+		Text item=Thermo_OpMode_OpPart label="[ %s ]" icon="icon_abs_clocked"	visibility=[Thermo_OpPart==22]
+		{
+			Selection   item=Thermo_OpPart label="Retour en AUTO :" icon="id_absmode" mappings=[22="Bientôt", 21="Jamais"] visibility=[Thermo_OpMode==2]
+
+        	Setpoint item=Thermo_Time_Absc_HR_nb minValue=0 maxValue=23 step=1 visibility=[Thermo_OpPart==22]
+            Setpoint item=Thermo_Time_Absc_MN_nb minValue=0 maxValue=55 step=5 visibility=[Thermo_OpPart==22]
+			Switch   item=Thermo_Time_Absc_SetOK mappings=[2="OK", 3="CANCEL"] visibility=[Thermo_Time_Absc_SetOK!=0]
+		}
+
+		Text item=Thermo_OpMode_OpPart label="[ %s ]" icon="icon_abs_calendar"	visibility=[Thermo_OpPart==21]
+		{
+			Selection   item=Thermo_OpPart label="Retour en AUTO :" icon="id_absmode" mappings=[22="Bientôt", 21="Jamais"] visibility=[Thermo_OpMode==2]
+
+        	Setpoint item=Thermo_Time_Absc_HR_nb minValue=0 maxValue=23 step=1 visibility=[Thermo_OpPart==22]
+            Setpoint item=Thermo_Time_Absc_MN_nb minValue=0 maxValue=55 step=5 visibility=[Thermo_OpPart==22]
+			Switch   item=Thermo_Time_Absc_SetOK mappings=[2="OK", 3="CANCEL"] visibility=[Thermo_Time_Absc_SetOK!=0]
+		}
+	    
+	    Text      item=Thermo_OpMode_OpPart label="[ %s ]" icon="sunrise"          visibility=[Thermo_OpPart==4]
+	    Text      item=Thermo_OpMode_OpPart label="[ %s ]" icon="sunday"           visibility=[Thermo_OpPart==5]
+	    Text      item=Thermo_OpMode_OpPart label="[ %s ]" icon="sunset"           visibility=[Thermo_OpPart==6]
+	    Text      item=Thermo_OpMode_OpPart label="[ %s ]" icon="sunight"          visibility=[Thermo_OpPart==7]
 
 	    Text      item=Indoor_Measured_Temp
 	}
 
 	Frame label="Informations"
 	{
-		Text item=chThermo_BattLevel
+		Text item=Thermo_BattLevel
 		Text item=Outdoor_Weather_Temp	
 		Text item=Outdoor_Weather_Humid	
 	}
@@ -56,11 +73,11 @@ sitemap RMJ label="Gestion SIBIR"
 		
 			Frame label="Températures" icon="temperature"
 			{
-				Setpoint item=Thermo_Temp_Matn   		minValue=5.0 maxValue=30.0 step=1.0 			
-				Setpoint item=Thermo_Temp_Jour   		minValue=5.0 maxValue=30.0 step=1.0 		
-				Setpoint item=Thermo_Temp_Soir   		minValue=5.0 maxValue=30.0 step=1.0 					
-				Setpoint item=Thermo_Temp_Nuit   		minValue=5.0 maxValue=30.0 step=1.0 						
-				Setpoint item=Thermo_Temp_Absence		minValue=5.0 maxValue=30.0 step=1.0 						
+				Setpoint item=Thermo_Temp_Matn   minValue=5.0 maxValue=30.0 step=1.0 			
+				Setpoint item=Thermo_Temp_Jour   minValue=5.0 maxValue=30.0 step=1.0 		
+				Setpoint item=Thermo_Temp_Soir   minValue=5.0 maxValue=30.0 step=1.0 					
+				Setpoint item=Thermo_Temp_Nuit   minValue=5.0 maxValue=30.0 step=1.0 						
+				Setpoint item=Thermo_Temp_Absc   minValue=5.0 maxValue=30.0 step=1.0 						
 			}
 
 		}
@@ -104,8 +121,6 @@ sitemap RMJ label="Gestion SIBIR"
 				Text	item=Thermo_Command
 				Text	item=Sibir_Real_State
 				
-			    Switch  item=MyTestSwitch  
-			    
 			}
 
 		}
