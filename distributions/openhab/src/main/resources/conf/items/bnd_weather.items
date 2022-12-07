@@ -1,8 +1,8 @@
-// Open Weather Map
-Number   chYahooWeather_Temp  "chYahooWeather_Temp"     {channel="openweathermap:weather-and-forecast:e80926bd5c:local:current#temperature"}
-Number   chYahooWeather_Humid "chYahooWeather_Humid"    {channel="openweathermap:weather-and-forecast:e80926bd5c:local:current#humidity"}
+// OpenWeatherMap Weather
+Number   chYahooWeather_Temp  "chYahooWeather_Temp"     {channel="openweathermap:weather-and-forecast:65d0065502:local:current#temperature"}
+Number   chYahooWeather_Humid "chYahooWeather_Humid"    {channel="openweathermap:weather-and-forecast:65d0065502:local:current#humidity"}
 
-//String   localStationId       "ID [%s]"                             { channel="openweathermap:weather-api:03ca069431:station#id" }
-//String   localStationName     "Name [%s]"                           { channel="openweathermap:weather-api:03ca069431:station#name" }
-//Location localStationLocation "Location [%2$s°N %3$s°E]" <location> { channel="openweathermap:weather-api:03ca069431:station#location" }
+String   localStationId       "ID [%s]"                             { channel="openweathermap:weather-api:65d0065502:station#id" }
+String   localStationName     "Name [%s]"                           { channel="openweathermap:weather-api:65d0065502:station#name" }
+Location localStationLocation "Location [%2$s°N %3$s°E]" <location> { channel="openweathermap:weather-api:65d0065502:station#location" }
 

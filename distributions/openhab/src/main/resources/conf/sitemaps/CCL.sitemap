@@ -28,7 +28,10 @@ sitemap CCL label="Panasonic PAC"
 	    Text      item=Thermo_OpMode_OpPart label="[ %s ]" icon="sunset"           visibility=[Thermo_OpPart==6]
 	    Text      item=Thermo_OpMode_OpPart label="[ %s ]" icon="sunight"          visibility=[Thermo_OpPart==7]
 
-	    Text      item=Indoor_Measured_Temp
+	    Text      item=chPana_Temp_Extern
+	    Text      item=chPana_Temp_Bureau
+	    Text      item=chPana_Temp_Chambre
+	    Text      item=chPana_Temp_Cuisine
 	}
 
 	Frame label="Informations"

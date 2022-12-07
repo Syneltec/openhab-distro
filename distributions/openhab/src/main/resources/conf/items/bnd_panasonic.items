@@ -1,0 +1,10 @@
+/* Physical Linked Items */ 
+
+Group    gPanaPAC_Chart
+
+// Unités Clim : Températures mesurées             
+Number  chPana_Temp_Bureau     "Temp.Bureau  [%.1f °C]"   (gPanaPAC_Chart) //{panasoniccomfortcloud:aircondition:b0c0a97eab:CS-Z20XKEW-4886703365:currentIndoorTemperature}  //CS-Z20XKEW-4886703365
+Number  chPana_Temp_Chambre    "Temp.Chambre [%.1f °C]"   (gPanaPAC_Chart) //{panasoniccomfortcloud:aircondition:b0c0a97eab:CS-Z20XKEW-4886704315:currentIndoorTemperature}  //CS-Z20XKEW-4886704315
+Number  chPana_Temp_Cuisine    "Temp.Cuisine [%.1f °C]"   (gPanaPAC_Chart) //{panasoniccomfortcloud:aircondition:b0c0a97eab:CS-Z35XKEW-4886915011:currentIndoorTemperature}  //CS-Z35XKEW-4886915011
+
+Number  chPana_Temp_Extern     "Temp.Ext.Pana.  [%.1f °C]"   (gPanaPAC_Chart) //{panasoniccomfortcloud:aircondition:b0c0a97eab:CS-Z35XKEW-4886915011:currentIndoorTemperature}  //CS-Z35XKEW-4886915011
