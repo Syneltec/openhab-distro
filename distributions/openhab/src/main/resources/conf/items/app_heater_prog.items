@@ -10,19 +10,18 @@ Number  MagicNumber (gThermo_Params_persist)
 Number  ThermoTrigger
 
 Number  Thermo_BattLevel    "Niveau Batterie [%d %%]"  <battery>      
-Switch  Thermo_Command      "Thermost.Cmd [%s]"        <id_switch>
-Switch  Sibir_Real_State    "Sibir State [%s]"         <id_fire>
+Switch  Thermo_Command      "Thermost.Cmd [%s]"        <id_fire>
 
 Number  Thermo_Temp_Bureau     "Temp.Bureau   [%.1f °C]"  (gTemperaturesChart)
 Number  Thermo_Temp_Chambre    "Temp.Chambre  [%.1f °C]"  (gTemperaturesChart)
 Number  Thermo_Temp_Cuisine    "Temp.Cuisine  [%.1f °C]"  (gTemperaturesChart)
-Number  Thermo_Temp_Extern     "Temp.Ext.Pana.[%.1f °C]"  (gTemperaturesChart)
+
+Number  Thermo_Temp_Extern     "Temp.Ext.Pana.[%.1f °C]"  (gDebugChart)
 
 Number  Temp_Chart_Period   "Période d'affich"                               
 
-Number   Indoor_Measured_Temp    "Température Intérieure [%.1f °C]" <icon_temperature_inside>    (gTemperaturesChart)
-Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_temperature_outside>   (gTemperaturesChart)
-Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <icon_humidity>            //(gTemperaturesChart)
+Number   Outdoor_Weather_Temp    "Température Extérieure [%.1f °C]" <icon_temperature_outside>   (gDebugChart)
+Number   Outdoor_Weather_Humid   "Humidité    Extérieure [%.1f %%]" <icon_humidity>            //(gDebugChart)
 
 Number   Thermo_OpMode    (gThermo_Params_persist)
 Number   Thermo_OpPart 

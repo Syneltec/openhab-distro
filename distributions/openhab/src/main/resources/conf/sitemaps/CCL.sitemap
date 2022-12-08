@@ -36,6 +36,7 @@ sitemap CCL label="Panasonic PAC"
 
 	Frame label="Informations"
 	{
+		Text item=Thermo_Command
 		Text item=Thermo_BattLevel
 		Text item=Outdoor_Weather_Temp	
 		Text item=Outdoor_Weather_Humid	

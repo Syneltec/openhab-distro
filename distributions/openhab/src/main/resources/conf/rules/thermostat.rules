@@ -33,62 +33,6 @@ rule "Weather Outdoor Humid" when Item chYahooWeather_Humid	changed
 end
 
 //*****************************************************************************
-rule "chThermo_BattLevel" when Item chThermo_BattLevel    changed          
-then 
-    Thermo_BattLevel.postUpdate     (chThermo_BattLevel.state) 	
-end
-
-rule "chThermo_MeasTemp"  when Item chThermo_MeasTemp     changed          
-then 
-    Indoor_Measured_Temp.postUpdate (chThermo_MeasTemp.state)
-end
-
-//*****************************************************************************
-// Debug purpose : Chart 
-
-rule "DBG System started" when System started
-then 
-	DBG_Thermo_Command.postUpdate   (0.0)	// false -> 20
-	DBG_SibSw_Ist_RealCmd.postUpdate(0.5)	// false -> 20
-	DBG_SibSw_Soll_InpCmd.postUpdate(1.0)	// false -> 20
-end
-
-//*****************************************************************************
-rule "chThermo_HeaterCmd" when Item chThermo_HeaterCmd  received update 
-then 
-	Thermo_Command.postUpdate(chThermo_HeaterCmd.state) 
-
-	// Debug purpose : Chart 
-	if (chThermo_HeaterCmd.state == OFF) 	// scaled as :
-		DBG_Thermo_Command.postUpdate(0.0)	// false -> 20
-	else
-		DBG_Thermo_Command.postUpdate(3.0)	// true  -> 22
-end
-
-//*****************************************************************************
-rule "chSibSwBin_Ist_RealCmd" when Item chSibSwBin_Ist_RealCmd changed
-then 
-	Sibir_Real_State.postUpdate(chSibSwBin_Ist_RealCmd.state) 
-
-	// Debug purpose : Chart 
-	if (chSibSwBin_Ist_RealCmd.state == OFF)	// scaled as :
-		DBG_SibSw_Ist_RealCmd.postUpdate(0.5)	// false -> 20
-	else
-		DBG_SibSw_Ist_RealCmd.postUpdate(3.5)	// true  -> 22
-end
-
-rule "chSibSwBin_Soll_InpCmd" when Item chSibSwBin_Soll_InpCmd changed
-then 
-	// Debug purpose : Chart 
-	if (chSibSwBin_Soll_InpCmd.state == OFF)	// scaled as :
-		DBG_SibSw_Soll_InpCmd.postUpdate(1.0)	// false -> 20
-	else
-		DBG_SibSw_Soll_InpCmd.postUpdate(4.0)	// true  -> 22
-end
-
-
-//*****************************************************************************
-//*****************************************************************************
 //*****************************************************************************
 rule "Thermo System : System started"  when System started
 then
