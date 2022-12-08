@@ -46,15 +46,8 @@ end
 //*****************************************************************************
 // Debug purpose : Chart 
 
-rule "DBG_chSibSwNum_SWITCH_State"  when Item chSibSwNum_SWITCH_State	changed  
-then 
-    DBG_SibNum_SWITCH_State.postUpdate	((chSibSwNum_SWITCH_State.state as Number).intValue) 	
-end
-
 rule "DBG System started" when System started
 then 
-	DBG_SibNum_SWITCH_State.postUpdate	(0) 	
-
 	DBG_Thermo_Command.postUpdate   (0.0)	// false -> 20
 	DBG_SibSw_Ist_RealCmd.postUpdate(0.5)	// false -> 20
 	DBG_SibSw_Soll_InpCmd.postUpdate(1.0)	// false -> 20

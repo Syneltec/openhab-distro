@@ -5,7 +5,7 @@ Group    gDebugChart
 Group    gTemperaturesChart                                                                            
 Group    gThermo_Params_persist  
                                                                           
-Number  SYS_InitLevel "sys init level"
+Number  SYS_InitLevel "sys init level [%d]"
 Number  MagicNumber (gThermo_Params_persist)
 Number  ThermoTrigger
 
@@ -13,10 +13,10 @@ Number  Thermo_BattLevel    "Niveau Batterie [%d %%]"  <battery>
 Switch  Thermo_Command      "Thermost.Cmd [%s]"        <id_switch>
 Switch  Sibir_Real_State    "Sibir State [%s]"         <id_fire>
 
-Number  DBG_Thermo_Command      "DBG Thermo REQ [%.1f]" (gDebugChart)
-Number  DBG_SibSw_Soll_InpCmd   "DBG SibSw  REQ [%.1f]" (gDebugChart)
-Number  DBG_SibSw_Ist_RealCmd   "DBG SibSw  RES [%.1f]" (gDebugChart)
-Number  DBG_SibNum_SWITCH_State "DBG SibSw STATE  [%d]" (gDebugChart)
+Number  Thermo_Temp_Bureau     "Temp.Bureau   [%.1f °C]"  (gTemperaturesChart)
+Number  Thermo_Temp_Chambre    "Temp.Chambre  [%.1f °C]"  (gTemperaturesChart)
+Number  Thermo_Temp_Cuisine    "Temp.Cuisine  [%.1f °C]"  (gTemperaturesChart)
+Number  Thermo_Temp_Extern     "Temp.Ext.Pana.[%.1f °C]"  (gTemperaturesChart)
 
 Number  Temp_Chart_Period   "Période d'affich"                               
 

@@ -120,10 +120,10 @@ then
 		Thermo_Temp_Manual.postUpdate(setpoint)
         Thermo_OpPart.postUpdate (OpPart)
         Thermo_OpMode_OpPart.postUpdate(txt)	
-		if (chThermo_SetPoint_Out.state != setpoint)
-    	{
-        	chThermo_SetPoint_Out.sendCommand(setpoint)
-    	}
+//		if (chThermo_SetPoint_Out.state != setpoint)
+//    	{
+//        	chThermo_SetPoint_Out.sendCommand(setpoint)
+//    	}
     	
         logInfo("thermotrigger.rules", "--TPM:" + Thermo_OpMode.state 
                                      + ", TPP:" + Thermo_OpPart.state 

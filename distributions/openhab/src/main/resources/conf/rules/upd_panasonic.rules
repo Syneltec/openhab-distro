@@ -1,0 +1,23 @@
+//*****************************************************************************
+
+rule "chPana_Temp_Bureau" when Item chPana_Temp_Bureau
+changed then  
+   if (chPana_Temp_Bureau.state > -50 ) Thermo_Temp_Bureau.postUpdate  (chPana_Temp_Bureau.state)  
+end
+
+rule "chPana_Temp_Chambre" when Item chPana_Temp_Chambre  
+changed then  
+   if (chPana_Temp_Chambre.state > -50) Thermo_Temp_Chambre.postUpdate (chPana_Temp_Chambre.state)  
+end
+
+rule "chPana_Temp_Cuisine" when Item chPana_Temp_Cuisine    
+changed then  
+   if (chPana_Temp_Cuisine.state > -50) Thermo_Temp_Cuisine.postUpdate (chPana_Temp_Cuisine.state)  
+end
+
+rule "chPana_Temp_Extern" when Item chPana_Temp_Extern    
+changed then
+   if (chPana_Temp_Extern.state > -50) Thermo_Temp_Extern.postUpdate   (chPana_Temp_Extern.state)  
+end
+
+//*****************************************************************************
